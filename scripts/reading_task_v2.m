@@ -28,7 +28,7 @@ prompt = {...
     }; 
 dlg_ans = inputdlg(prompt); 
 
-subj.Num = dlg_ans{1};
+subj.num = dlg_ans{1};
 subj.whichSess = str2double(dlg_ans{2}); 
 subj.firstRun = str2double(dlg_ans{3}); 
 subj.lastRun  = str2double(dlg_ans{4}); 
@@ -50,8 +50,8 @@ scan.TR     = 1.000;
 scan.epiNum = 10; % Number of EPI acquisitions
 
 % Timing
-t.events      = 16; 
-t.stimNum     = 16; 
+t.events      = 18; 
+t.stimNum     = 18; 
 t.jitWindow   = 1.000; % Change this?
 t.presTime    = 4.000; % Change this?
 t.epiTime     = 10.000; % Change this?
@@ -98,14 +98,10 @@ firstPulse = NaN(1, maxNumRuns);
 runEnd     = NaN(1, maxNumRuns); 
 
 %% File names
-% if Training
-%     filetag = [subj.Num '_practice_']; 
-% else
-    filetag = [subj.Num '_aphasia_']; 
-% end
+filetag = [subj.num '_aphasia_']; 
 
-ResultsXls = fullfile(dir_results, subj.Num, [filetag 'read_results.xlsx']); 
-Variables  = fullfile(dir_results, subj.Num, [filetag 'read_variables.mat']); 
+ResultsXls = fullfile(dir_results, subj.num, [filetag 'read_results.xlsx']); 
+Variables  = fullfile(dir_results, subj.num, [filetag 'read_variables.mat']); 
     
 %% Load stim
 if strcmp(scriptTest, 'test')
