@@ -11,11 +11,10 @@
 %   160)
 % 05/03/18  Updated to run FST for aphasia study
 
-% function fst_v1
+function fst_v1
 %% Startup
-sca; DisableKeysForKbCheck([]); KbQueueStop; 
-Screen('Preference','VisualDebugLevel', 0);  
-Screen('Preference', 'SkipSyncTests', 1);
+sca; DisableKeysForKbCheck([]); KbQueueStop;
+Screen('Preference','VisualDebugLevel', 0);
 
 PsychPortAudio('Close'); 
 InitializePsychSound
@@ -52,6 +51,15 @@ else
     Mock = 0;
 end
 
+% Test flag
+if strcmp(scriptTest, 'test')
+    Test = 1;
+else
+    Test = 0;
+end
+
+Screen('Preference', 'SkipSyncTests', Test);
+
 % Scan type
 scan.type   = 'Hybrid';
 scan.TR     = 1.000; 
@@ -86,7 +94,7 @@ dir_exp = pwd;
 
 dir_stim    = fullfile(dir_exp, 'stim', 'fst');
 dir_scripts = fullfile(dir_exp, 'scripts');
-dir_results = fullfile(dir_exp, 'results');
+dir_results = fullfile(dir_exp, 'results', subj.num);
 dir_funcs   = fullfile(dir_scripts, 'functions');
 
 cd ..
@@ -112,7 +120,6 @@ recStartKey   = NaN(t.events, maxNumRuns);
 stimDuration  = NaN(t.events, maxNumRuns); 
 stimEnd       = NaN(t.events, maxNumRuns); 
 stimEndKey    = NaN(t.events, maxNumRuns);
-stimKey       = NaN(t.events, maxNumRuns);
 stimStart     = NaN(t.events, maxNumRuns); 
 stimStartKey  = NaN(t.events, maxNumRuns); 
 
@@ -209,7 +216,7 @@ end
 % Do we want to use the same stimuli in the pre- and post-training scan
 % sessions?
 cd(dir_funcs)
-stimulicheck(numSpeechSounds, eventKey); 
+stimulicheck_fst(numSpeechSounds, eventKey); 
 
 for ii = subj.firstRun:subj.lastRun
     stimDuration(:, ii) = rawStimDur(eventKey(:,ii))'; 
@@ -281,10 +288,10 @@ try
         for evt = 1:t.events
             eventStart(evt, blk) = GetSecs(); 
 
-            PsychPortAudio('FillBuffer', pahandle, audio{eventKey(evt, blk)});
+            PsychPortAudio('FillBuffer', pahandle, ad{eventKey(evt, blk)});
             WaitTill(AbsStimStart(evt, blk)-0.1); 
 
-            stimStart(evt, blk) = PsychPortAudio('Start', pahandle, 1, AbsStimStart(evt, blk));
+            stimStart(evt, blk) = PsychPortAudio('Start', pahandle, 1, AbsStimStart(evt, blk), 1);
             WaitTill(AbsStimEnd(evt, blk)); 
             stimEnd(evt, blk) = GetSecs; 
             RTBox('Clear'); 
@@ -311,7 +318,7 @@ catch err
     runEnd(blk) = GetSecs();  %#ok<NASGU>
     cd(dir_funcs)
     disp('Dumping data...')
-%     OutputData
+    OutputData_fst
     cd(dir_scripts)
     PsychPortAudio('Close'); 
     disp('Done!')
@@ -324,10 +331,10 @@ PsychPortAudio('Close');
 DisableKeysForKbCheck([]); 
 
 %% Save data
-% cd(dir_funcs)
-% disp('Please wait, saving data...')
-% OutputData
-% disp('All done!')
-% cd(dir_scripts)
+cd(dir_funcs)
+disp('Please wait, saving data...')
+OutputData_fst
+disp('All done!')
+cd(dir_scripts)
 
-% end
+end
