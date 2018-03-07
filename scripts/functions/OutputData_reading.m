@@ -27,8 +27,8 @@ actJit       = stimStart - eventStart;
 actEventDur  = eventEnd - eventStart; 
 
 % Path
-mkdir(fullfile(dir_results, subj.Num))
-cd(fullfile(dir_results, subj.Num))
+mkdir(fullfile(dir_results, subj.num))
+cd(fullfile(dir_results, subj.num))
 
 % Checks if files already exists to prevent overwrite
 while exist(ResultsXls, 'file') == 2
