@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <configSections>
+        <section name="DisplacementTarget" type="Target.TargetConfiguration, Target, Version=1.0.2.5, Culture=neutral, PublicKeyToken=null" />
+        <section name="General" type="Pst.BrainLogics.Simulator.MotionDetectionServer.GeneralConfiguration, MoTrak, Version=1.0.2.5, Culture=neutral, PublicKeyToken=null" />
+        <section name="OrientationTarget" type="Target.TargetConfiguration, Target, Version=1.0.2.5, Culture=neutral, PublicKeyToken=null" />
+    </configSections>
+    <DisplacementTarget centerGradientColor="Green" innerCircleColor="Green"
+        middleCircleColor="Yellow" outerCircleColor="Red" crosshairColor="Silver"
+        backgroundColor="Black" overlayColor="Blue" legendColor="Aqua"
+        circleLineWidth="1" crosshairLineWidth="4" crosshairSizeRatio="0.1"
+        innerCircleRatio="0.333333343" middleCircleRatio="0.6666667"
+        mirrorTheta="false" mirrorX="false" mirrorY="false" circleStyle="SolidStyle"
+        selectedAxes="0" thetaRange="3" xRange="3" yRange="3" swapAxes="false"
+        crosshairStyle="NonPointed" enableZAxis="true" enableOverlay="true"
+        enableLegend="true" fontSize="12" fontString0="X" fontString1="Y"
+        fontString2="Z" />
+    <General angleGraphScale="2" dispGraphScale="3" angleGraphShowDiso="true"
+        angleGraphShowPitch="true" angleGraphShowRoll="true" angleGraphShowYaw="true"
+        dispGraphShowDisp="true" dispGraphShowX="true" dispGraphShowY="true"
+        dispGraphShowZ="true" movieFileName="" pauseMovieThreshold="1"
+        soundFileName="" playSoundThreshold="1" loopDelay="0" loopSound="false"
+        averaging="true" bufferSize="8" mirrorUserDisplay="true" logFileFolder="C:\Documents and Settings\ccbbi_user\My Documents\PST\MoTrak\Logs\"
+        logFileType="1" />
+    <OrientationTarget centerGradientColor="Green" innerCircleColor="Green"
+        middleCircleColor="Yellow" outerCircleColor="Red" crosshairColor="Silver"
+        backgroundColor="Black" overlayColor="Blue" legendColor="Aqua"
+        circleLineWidth="1" crosshairLineWidth="4" crosshairSizeRatio="0.1"
+        innerCircleRatio="0.3333333" middleCircleRatio="0.6666667"
+        mirrorTheta="false" mirrorX="false" mirrorY="false" circleStyle="SolidStyle"
+        selectedAxes="0" thetaRange="2" xRange="2" yRange="2" swapAxes="false"
+        crosshairStyle="NonPointed" enableZAxis="true" enableOverlay="true"
+        enableLegend="true" fontSize="12" fontString0="Yaw" fontString1="Pitch"
+        fontString2="Roll" />
+</configuration>
