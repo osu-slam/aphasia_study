@@ -1,5 +1,6 @@
-%% exp_v3.m
-% Expressive language task for aphasia study with Time Woman. 
+%% picture_v1.m
+% Expressive language task involving picture naming for aphasia study with 
+% Time Woman. 
 
 % CHANGELOG (DD/MM/YY)
 % 19/02/18 -- Started script from isss_multiband as template. 
@@ -9,27 +10,26 @@
 %   PTB
 % 05/03/18 -- Done with v2? 
 % 07/03/18 -- V3 begins with updates made for compatibility at CCBBI. 
-% 15/03/18 -- New mock stimuli. Here is why I added them:
-%    1) Starts with a "wo-" sound, TW has said "wow" before
-%    3) Includes a word ("dime") that rhymes with "time"
-%    4) Starts with "tie", which sounds similar to "time"
-%    6) Includes "tissue", which is similar but not the same as "time"
-%    9) Starts with the word "time"
-%   10) TW has said the word "try", can she say "trying"?
-%   12) Features the word "time" as a root of a larger word
-%   14) Another "ti-" sound that closely resembles "time"
-%   Also changed the jabberwocky to test "ti-" and words that rhyme with 
-%   time. 
+% 15/03/18 -- Forked from exp_v3 into picture task. Still needs testing at
+%   mock scanner. 
 
-function exp_v3
+function picture_v1
 %% Startup
 sca; DisableKeysForKbCheck([]); KbQueueStop; clearvars; clc; 
 Screen('Preference','VisualDebugLevel', 0);  
+screens = Screen('Screens');
+screenNumber = max(screens);
+white = WhiteIndex(screenNumber);
+black = BlackIndex(screenNumber);
+grey = white / 2;
+inc = white - grey;
+
 
 codeStart = GetSecs();  %#ok<NASGU>
-AudioDevice = PsychPortAudio('GetDevices', 3); %#ok<NASGU> % Changes based on OS
 
 %% Parameters
+resolution = 800;
+
 prompt = {...
     'Subject number (####YL)', ...
     'Which session (1 - pre/2 - post)', ...
@@ -93,7 +93,7 @@ dir_exp     = pwd;
 
 dir_results = fullfile(dir_exp, 'results');
 dir_scripts = fullfile(dir_exp, 'scripts');
-dir_stim    = fullfile(dir_exp, 'stim', 'naming_task');
+dir_stim    = fullfile(dir_exp, 'stim', 'picture_task', num2str(resolution));
 
 dir_funcs   = fullfile(dir_scripts, 'functions');
 
@@ -123,41 +123,25 @@ runEnd     = NaN(1, maxNumRuns);
 %% File names
 filetag = [subj.num '_aphasia_']; 
 
-ResultsXls = fullfile(dir_results, subj.num, [filetag 'exp_results.xlsx']);  %#ok<NASGU>
-Variables  = fullfile(dir_results, subj.num, [filetag 'exp_variables.mat']); %#ok<NASGU>
+ResultsXls = fullfile(dir_results, subj.num, [filetag 'pic_results.xlsx']);  %#ok<NASGU>
+Variables  = fullfile(dir_results, subj.num, [filetag 'pic_variables.mat']); %#ok<NASGU>
     
 %% Load stim
-if Test
-    stim_filename = 'naming_task_stim_scripttest.txt.';
-elseif Mock
-    stim_filename = 'naming_task_stim_mock.txt.';
-else
-    if subj.whichSess == 1
-        stim_filename = 'naming_task_stim_pretrain.txt';
-    elseif subj.whichSess == 2
-        stim_filename = 'naming_task_stim_posttrain.txt';
-    end
-end
-
-stim_file = fullfile(dir_stim, stim_filename);
-stim_line = cell(1, t.stimNum);
-
-fid = fopen(stim_file);
-ii = 0;
-while 1
-    ii = ii + 1;
-    line = fgetl(fid);
-    if ~ischar(line)
-        break
-    end
-    stim_line{ii} = line;
-end
-fclose(fid);
+cd(dir_stim)
+stim_files = dir('*.png');
 
 % CHECK -- Did we load correct number of stimuli???
-if length(stim_line) ~= t.stimNum
+if length(stim_files) ~= t.stimNum
     sca
-    error('length(stim_line) ~= t.stimNum: check stimuli folder or t.stimNum')
+    error('length(stim_files) ~= t.stimNum: check stimuli folder or t.stimNum')
+end
+
+stim_name = cell(t.stimNum, 1);
+stim_image = cell(t.stimNum, 1);
+for ii = 1:t.stimNum
+    stim_name{ii} = fullfile(stim_files(ii).folder, stim_files(ii).name);
+    [img, ~, a] = imread(stim_name{ii}, 'png');
+    stim_image{ii} = cat(3, img, a);
 end
 
 % Shuffle events 
@@ -166,7 +150,8 @@ for ii = subj.firstRun:subj.lastRun
 end
 
 %% Open PTB and RTBox
-[wPtr, rect] = Screen('OpenWindow', 0, 185);
+[wPtr, rect] = Screen('OpenWindow', 0, white);
+Screen('BlendFunction', wPtr, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
 DrawFormattedText(wPtr, 'Please wait, preparing experiment...');
 Screen('Flip', wPtr);
 
@@ -214,13 +199,12 @@ try
         for evt = 1:t.events
             eventStart(evt, blk) = GetSecs(); 
             
-            % DRAW ON TEXT (flip screen, prepare next screen)
-            DrawFormattedText(wPtr, stim_line{stimKey(evt, blk)}, 'center', 'center');
+            % DRAW ON IMAGE (flip screen, prepare next screen)
+            imageTexture = Screen('MakeTexture', wPtr, stim_image{stimKey(evt, blk)});
+            Screen('DrawTexture', wPtr, imageTexture, [], [], 0);
             WaitTill(AbsStimStart(evt, blk) - 0.1);
             stimStart(evt, blk) = Screen('Flip', wPtr, AbsStimStart(evt, blk));
             Screen('DrawLines', wPtr, crossCoords, 2, 0, [centerX, centerY]);
-            
-            % Audio recording happens on my laptop
             
             % LEAVE IT FOR A BIT
             WaitTill(AbsStimEnd(evt, blk) - 0.1); 

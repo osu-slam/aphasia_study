@@ -14,7 +14,7 @@
 % 07/03/08  V2, updating with errors I had while testing at CCBBI. Also 
 %   changing jitterKey and presTime, set up TEST profile -- MH
 
-function per_v2
+function listening_v2
 %% Startup
 sca; DisableKeysForKbCheck([]); KbQueueStop;
 Screen('Preference','VisualDebugLevel', 0);
@@ -106,7 +106,7 @@ t.jitWindow = 1.000;  % 1 second, see notes below.
 cd ..
 dir_exp = pwd; 
 
-dir_stim    = fullfile(dir_exp, 'stim', 'fst');
+dir_stim    = fullfile(dir_exp, 'stim', 'listening_task');
 dir_scripts = fullfile(dir_exp, 'scripts');
 dir_results = fullfile(dir_exp, 'results', subj.num);
 dir_funcs   = fullfile(dir_scripts, 'functions');
