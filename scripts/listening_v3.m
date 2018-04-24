@@ -16,9 +16,12 @@
 % 26/03/18  Changing experiment length, this is now v3. Removed noise 
 %   condition during mock scan, went from 16 to 8 trials. NOTE: CODE ONLY
 %   WORKS FOR MOCK SCAN RIGHT NOW. NEED TO UPDATE WTIH FINAL STIMULI FOR 
-%   BOTH PRE AND POST THERAPY SCANS. -- MH
+%   BOTH PRE AND POST THERAPY SCANS. -- MH1
+% 20/04/18  Stimuli finalized for pre- and post-therapy scans, am recoding
+%   with 10 trials (8 stim, 2 noise) that are pseudo-randomized. NEEDS TO
+%   BE TESTED TO SEE IF IT WORKS
 
-function listening_v3
+% function listening_v3
 %% Startup
 sca; DisableKeysForKbCheck([]); KbQueueStop;
 Screen('Preference','VisualDebugLevel', 0);
@@ -38,8 +41,8 @@ AudioDevice = PsychPortAudio('GetDevices', 3);
 prompt = {...
     'Subject number (####YL)', ...
     'Which session (1 - pre/2 - post)', ...
-    'First run (1-4, enter 0 for mock)', ... 
-    'Last run (1-4, enter 0 for mock)', ... 
+    'First run (1-20, enter 0 for mock)', ... 
+    'Last run (1-20, enter 0 for mock)', ... 
     'RTBox connected (0/1):', ...
     'Script test (type "test" or leave blank)', ... 
     }; 
@@ -49,11 +52,11 @@ subj.num  = dlg_ans{1};
 if strcmp(subj.num, 'TEST')
     subj.whichSess = 1;
     subj.firstRun = 1;
-    subj.lastRun  = 4;
+    subj.lastRun  = 20;
     ConnectedToRTBox = 0;
     dlg_ans{6} = 'test';
 else
-    subj.whichSess = dlg_ans{2}; 
+    subj.whichSess = str2double(dlg_ans{2}); 
     subj.firstRun = str2double(dlg_ans{3}); 
     subj.lastRun  = str2double(dlg_ans{4}); 
     ConnectedToRTBox   = str2double(dlg_ans{5}); 
@@ -85,14 +88,20 @@ scan.TR     = 1.000;
 scan.epiNum = 10; 
 
 % Number of stimuli -- Needs work
-numSentences = 48; % 48 different sentence structures in stim folder
-numSpeechSounds = numSentences*4;
-numStim = numSpeechSounds+6; % Four permutations per sentence, six noise
+if Mock == 1
+    numSentences = 48;
+    numSpeechSounds = numSentences*4;
+    numStim = numSpeechSounds+6;
+elseif subj.whichSess == 1
+    numSentences = 8; % 8 different sentence structures in stim folder
+    numSpeechSounds = numSentences*4;
+    numStim = numSpeechSounds+2; % Four structures per sentence, two noise
+end
 
 % Timing
-t.runs = length(subj.firstRun:subj.lastRun); % Maximum 4
+t.runs = length(subj.firstRun:subj.lastRun); % Maximum 20
 
-t.presTime   = 5.000;  % 5 seconds, may change
+t.presTime   = 4.000;  % 4 seconds, may change
 t.epiTime    = 10.000; % 10 seconds
 t.eventTime  = t.presTime + t.epiTime;
 
@@ -110,7 +119,16 @@ t.jitWindow = 1.000;  % 1 second, see notes below.
 cd ..
 dir_exp = pwd; 
 
-dir_stim    = fullfile(dir_exp, 'stim', 'listening_task');
+if Mock == 1 % If mock
+    dir_stim = fullfile(dir_exp, 'stim', 'listening_all');
+    sesstag = 'mock';
+elseif subj.whichSess == 1 % If session 1
+    dir_stim = fullfile(dir_exp, 'stim', 'listening_pre_20Apr18');
+    sesstag = 'pre';
+else % If session 2
+    error('Stimuli for post session entered have not been counterbalanced')
+end
+
 dir_scripts = fullfile(dir_exp, 'scripts');
 dir_results = fullfile(dir_exp, 'results', subj.num);
 dir_funcs   = fullfile(dir_scripts, 'functions');
@@ -118,7 +136,7 @@ dir_funcs   = fullfile(dir_scripts, 'functions');
 cd ..
 
 %% Preallocating timing variables
-maxNumRuns = 4; 
+maxNumRuns = 20; 
 
 AbsEvStart    = NaN(t.events, maxNumRuns); 
 AbsStimStart  = NaN(t.events, maxNumRuns); 
@@ -146,9 +164,8 @@ respTime = cell(t.events, maxNumRuns);
 respKey  = cell(t.events, maxNumRuns); 
 
 %% File names
-filetag = [subj.num '_']; 
-ResultsXls = fullfile(dir_results, [subj.num '_per_results.xlsx']); 
-Variables  = fullfile(dir_results, [subj.num '_per_variables.mat']); 
+ResultsXls = fullfile(dir_results, [subj.num '_listening_' sesstag '_results.xlsx']); 
+Variables  = fullfile(dir_results, [subj.num '_listening_' sesstag '_variables.mat']); 
 
 %% Load stim
 % Stimuli
@@ -165,7 +182,7 @@ fs = cell(1, length(files));
 
 for ii = 1:length(files)
     [adTemp, fsTemp] = audioread(files(ii).name);
-    ad{ii}    = [adTemp'; adTemp']; % Convert mono to stereo
+    ad{ii} = [adTemp'; adTemp']; % Convert mono to stereo
     fs{ii} = fsTemp;
     if ii ~= 1 % Check samplingrate is same across files 
         if fs{ii} ~= fs{ii-1}
@@ -188,34 +205,47 @@ end
 %% Make keys
 % jitterKey -- How much is the silent period jittered by?
 for ii = subj.firstRun:subj.lastRun
-    jitterKey(:, ii) = 1 + rand(t.events, 1); % Add 1 because stimuli are short-ish
+    jitterKey(:, ii) = 1 + rand(t.events, 1); % Add 1 because stimuli are short
 end
 
 % speechkey -- Which speech stimuli should we use this run?
 % eventkey -- In what order will stimuli be presented?
-randomstim = NaN(8, maxNumRuns); % There are 8 sentences to present
+% randomstim = NaN(8, maxNumRuns); % There are 8 sentences to present
 
 if Mock
 %     sentence = repmat([129:4:192]', 1, 4); 
+%     noise = [];
+    % RANDOM STIM ORDER:    
     sentence = [137; 141; 145; 153; 161; 169; 181; 189];
-%     noise = repmat([197; 198], 1, 4);
-    noise = [];
+    noise = repmat([197; 198], 1, 4);    
+    randomStimOrder = 1;
+    
+elseif subj.whichSess == 1
+    load(fullfile(dir_funcs, 'sentence_order_final.mat'))
+    randomStimOrder = 0;
+    eventKey = sentence_order;
+    
+    % RANDOM STIM ORDER: 
+%     sentence = Shuffle(repmat([1:4:32]', 1, maxNumRuns));
+%     noise = [33, 34];
+%     randomStimOrder = 1;
+    
 else
-    sentence = [1:4:64; 65:4:128; 1:4:64; 65:4:128]';
-    noise = repmat([193, 195; 194, 196], 1, 2);
+    error('No stimuli for post yet')
 end
 
-for ii = subj.firstRun:subj.lastRun % v3 -- went from 16 to 8 trials
-    randomstim(:, ii) = Shuffle(vertcat( ... 
-        0 * ones(2, 1), ...  
-        1 * ones(2, 1), ...  
-        2 * ones(2, 1), ... 
-        3 * ones(2, 1) ... 
-        ));  
+if randomStimOrder
+    for ii = subj.firstRun:subj.lastRun % v3 -- went from 16 to 8 trials
+        randomstim(:, ii) = Shuffle(vertcat( ... 
+            0 * ones(2, 1), ...  
+            1 * ones(2, 1), ...  
+            2 * ones(2, 1), ... 
+            3 * ones(2, 1) ... 
+            ));  
+    end
+    speechKey = sentence + randomstim;
+    eventKey  = vertcat(speechKey, noise); 
 end
-
-speechKey = sentence + randomstim;
-eventKey  = Shuffle(vertcat(speechKey, noise)); 
 
 % anskey -- What should have subjects responded with?
 for ii = 1:t.events
@@ -341,4 +371,4 @@ OutputData_fst
 disp('All done!')
 cd(dir_scripts)
 
-end
+% end
