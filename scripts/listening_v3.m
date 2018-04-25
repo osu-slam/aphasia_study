@@ -70,7 +70,7 @@ if subj.firstRun == 0
     t.events = 8;
 else
     Mock = 0;
-    t.events = 10; % for this version, running 8 stimuli and 2 noise (no noise in mock)
+    t.events = 10; % for this version, running 8 stimuli, 1 noise, 1 silent (no noise or silent in mock)
 end
 
 % Test flag
@@ -87,7 +87,7 @@ scan.type   = 'Hybrid';
 scan.TR     = 1.000; 
 scan.epiNum = 10; 
 
-% Number of stimuli -- Needs work
+% Number of stimuli
 if Mock == 1
     numSentences = 48;
     numSpeechSounds = numSentences*4;
@@ -95,7 +95,7 @@ if Mock == 1
 elseif subj.whichSess == 1
     numSentences = 8; % 8 different sentence structures in stim folder
     numSpeechSounds = numSentences*4;
-    numStim = numSpeechSounds+2; % Four structures per sentence, two noise
+    numStim = numSpeechSounds+2; % Four structures per sentence, one noise, one silent
 end
 
 % Timing
@@ -241,7 +241,7 @@ if randomStimOrder
             1 * ones(2, 1), ...  
             2 * ones(2, 1), ... 
             3 * ones(2, 1) ... 
-            ));  
+            ));   %#ok<SAGROW>
     end
     speechKey = sentence + randomstim;
     eventKey  = vertcat(speechKey, noise); 
