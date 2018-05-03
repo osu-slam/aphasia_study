@@ -17,9 +17,9 @@ headers = {'Jitter key', 'Actual jitter', ...
 %% Saving relevant timing information
 % Convert to relative time, instead of system
 runDur = runEnd - firstPulse; 
-
-stimStartRel = stimStart - firstPulse;
-stimEndRel   = stimEnd   - firstPulse;
+fp = repmat(firstPulse, 10, 1);
+stimStartRel = stimStart - fp;
+stimEndRel   = stimEnd   - fp;
 stimDur = repmat(t.presTime, t.events, maxNumRuns); 
 
 actStimDur   = stimEnd   - stimStart; 

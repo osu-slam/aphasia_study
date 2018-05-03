@@ -7,7 +7,7 @@
 % ns = NumSpeechStimuli; 
 % eventkey = eventKey; 
 
-function stimulicheck_fst(ns, eventkey)
+function stimulicheck_naming(ns, eventkey)
 % Set up keys and preallocate when possible
 speech  = eventkey(eventkey <= ns); 
 s = length(speech); 

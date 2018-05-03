@@ -2,11 +2,12 @@
 % Saves data. Run as part of the main experiment script. Author -- Matt H
 
 % CHANGELOG (DD/MM/YY)
-% 08/08/17  Started keeping changelog. --MH
-% 08/08/17  Now allows for mulitple runs. --MH
-% 10/08/17  Ready for subject 3. --MH
+% 08/08/17  Started keeping changelog. -- MH
+% 08/08/17  Now allows for mulitple runs. -- MH
+% 10/08/17  Ready for subject 3. -- MH
 % 21/02/18  Customized for aphasia_study -- MH
 % 05/03/18  Finished for aphasia study
+% 03/05/18  Updated for CCBBI (i.e. fp workaround using repmat) -- MH
 
 headers = {'Jitter key', 'Actual jitter', ... 
         'Stim start key', 'Actual stim start', ...
@@ -30,9 +31,10 @@ for ii = 1:size(respKey, 1)
 end
 
 % Convert to relative time, instead of system
+fp = repmat(firstPulse, t.events, 1);
 runDur       = runEnd       - firstPulse; 
-stimStartRel = stimStart    - firstPulse;
-stimEndRel   = stimEnd      - firstPulse;
+stimStartRel = stimStart    - fp;
+stimEndRel   = stimEnd      - fp;
 actStimDur   = stimEnd      - stimStart; 
 actJit       = stimStart    - eventStart; 
 actEventDur  = eventEnd     - eventStart; 

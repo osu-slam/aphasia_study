@@ -221,7 +221,7 @@ if Mock
     randomStimOrder = 1;
     
 elseif subj.whichSess == 1
-    load(fullfile(dir_funcs, 'sentence_order_final.mat'))
+    load(fullfile(dir_funcs, 'listening_sentence_order_pre.mat'))
     randomStimOrder = 0;
     eventKey = sentence_order;
     
