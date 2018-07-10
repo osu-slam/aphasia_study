@@ -17,18 +17,18 @@ headers = {'Jitter key', 'Actual jitter', ...
 %% Saving relevant timing information
 % Convert to relative time, instead of system
 runDur = runEnd - firstPulse; 
-fp = repmat(firstPulse, 10, 1);
+fp = repmat(firstPulse, t.events, 1);
 stimStartRel = stimStart - fp;
 stimEndRel   = stimEnd   - fp;
-stimDur = repmat(t.presTime, t.events, maxNumRuns); 
+stimDur = repmat(t.presTime, t.events, blk); 
 
 actStimDur   = stimEnd   - stimStart; 
 actJit       = stimStart - eventStart; 
 actEventDur  = eventEnd - eventStart; 
 
 % Path
-mkdir(fullfile(dir_results, subj.num))
-cd(fullfile(dir_results, subj.num))
+mkdir(fullfile(dir_results, 'post_screen_10Jul18'))
+cd(fullfile(dir_results, 'post_screen_10Jul18'))
 
 % Checks if files already exists to prevent overwrite
 while exist(ResultsXls, 'file') == 2
@@ -39,15 +39,15 @@ while exist(Variables, 'file') == 2
 	Variables = [Variables(1:end-4), '_new', Variables(end-3:end)]; 
 end
 
-for run = subj.firstRun:subj.lastRun
+for rr = 1:blk
     %% Prepare to print to xlsx file
     data = cell(t.events + 1, length(headers)); 
     
-    M    = horzcat(jitterKey(:,run), actJit(:,run), ...
-        stimStartKey(:,run), stimStartRel(:,run), ...
-        stimEndKey(:,run), stimEndRel(:,run), ...
-        stimDur(:,run), actStimDur(:,run), ... 
-        stimKey(:,run), actEventDur(:,run));
+    M    = horzcat(jitterKey(:,rr), actJit(:,rr), ...
+        stimStartKey(:,rr), stimStartRel(:,rr), ...
+        stimEndKey(:,rr), stimEndRel(:,rr), ...
+        stimDur(:,rr), actStimDur(:,rr), ... 
+        stimKey(:,rr), actEventDur(:,rr));
 
     data(1,:) = headers; 
     for ii = 1:t.events
@@ -58,7 +58,7 @@ for run = subj.firstRun:subj.lastRun
     
     %% Print to xlsx file
     warning off
-    runNum = ['run ', num2str(run)];
+    runNum = ['run ', num2str(rr)];
     
     xlswrite(ResultsXls, data, runNum)
     warning on

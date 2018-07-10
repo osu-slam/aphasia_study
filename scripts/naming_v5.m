@@ -2,14 +2,14 @@
 % Expressive language task for aphasia study with Time Woman. 
 
 % CHANGELOG (DD/MM/YY)
-% 19/02/18 -- Started script from isss_multiband as template. 
-% 21/02/18 -- It works and looks pretty. Discussing with KM tomorrow. 
-% 01/03/18 -- Scan time determined. Updating code with new timing. Also
+% 02/19/18 -- Started script from isss_multiband as template. 
+% 02/21/18 -- It works and looks pretty. Discussing with KM tomorrow. 
+% 03/01/18 -- Scan time determined. Updating code with new timing. Also
 %   moved around stimuli. Also changed to make recording not dependent on
 %   PTB
-% 05/03/18 -- Done with v2? 
-% 07/03/18 -- V3 begins with updates made for compatibility at CCBBI. 
-% 15/03/18 -- New mock stimuli. Here is why I added them:
+% 03/05/18 -- Done with v2? 
+% 03/07/18 -- V3 begins with updates made for compatibility at CCBBI. 
+% 03/15/18 -- New mock stimuli. Here is why I added them:
 %    1) Starts with a "wo-" sound, TW has said "wow" before
 %    3) Includes a word ("dime") that rhymes with "time"
 %    4) Starts with "tie", which sounds similar to "time"
@@ -20,11 +20,14 @@
 %   14) Another "ti-" sound that closely resembles "time"
 %   Also changed the jabberwocky to test "ti-" and words that rhyme with 
 %   time. 
-% 26/03/18 -- V4 has a change in experiment length (10 trials). NOTE: DOES
+% 03/26/18 -- V4 has a change in experiment length (10 trials). NOTE: DOES
 %   NOT INCLUDE BASELINE (jabberwocky). 
-% 02/05/18 -- V5 is the version used in pre-screening. Double checking that
+% 05/02/18 -- V5 is the version used in pre-screening. Double checking that
 %   script is working and that stimuli are counterbalanced. Each run
 %   consists of four patterns, two sentences each, and two jabberwocky. 
+% 07/10/18 -- In progress of updating for post-test. Each run now consists 
+%   of the 16 sentences which TW has learned. Make sure to double check 
+%   this code is ready for scanning! AS OF NOW IT WILL NOT COMPLETE!
 
 % function naming_v5
 %% Startup
@@ -85,17 +88,6 @@ scan.type   = 'Hybrid';
 scan.TR     = 1.000; 
 scan.epiNum = 10; % Number of EPI acquisitions
 
-% Timing
-t.stimNum     = 36;  % changed with V5, includes jabberwocky
-t.sentNum     = 32;  
-t.jitWindow   = 1.000; % Change this?
-t.presTime    = 3.000; % Change this?
-t.epiTime     = 10.000; % Change this?
-t.eventTime   = t.jitWindow + t.presTime + t.epiTime;
-t.runDuration = t.epiTime + ...   % After first pulse
-    t.eventTime * t.events + ...  % Each event
-    t.eventTime;                  % After last acquisition
-    
 %% Paths
 cd ..
 dir_exp     = pwd; 
@@ -107,6 +99,36 @@ dir_stim    = fullfile(dir_exp, 'stim', 'naming_task');
 dir_funcs   = fullfile(dir_scripts, 'functions');
 
 % Instructions = 'instructions_lang.txt';
+
+%% Timing
+if subj.whichSess == 1
+    t.stimNum = 36; % changed with V5, includes jabberwocky
+    t.sentNum = 32;  
+    load(fullfile(dir_funcs, 'naming_sentence_order_pre.mat'))
+elseif subj.whichSess == 2
+    t.stimNum = 20; % have not checked jabberwocky with Yune
+    t.sentNum = 16; 
+    warning('Jabberwocky sentences have not been set.')
+    x = 's';
+    while ~isempty(x)
+        x = input('Press enter to confirm that this message has been read.');
+    end
+    
+    warning('Counterbalance has not been ensured. Order of primes is random!')
+    x = 's';
+    while ~isempty(x)
+        x = input('Press enter to confirm that this message has been read.');
+    end
+    
+end
+
+t.jitWindow   = 1.000; 
+t.presTime    = 3.000; 
+t.epiTime     = 10.000;
+t.eventTime   = t.jitWindow + t.presTime + t.epiTime;
+t.runDuration = t.epiTime + ...   % After first pulse
+    t.eventTime * t.events + ...  % Each event
+    t.eventTime;                  % After last acquisition
 
 %% Preallocating timing variables. 
 maxNumRuns = 20;
@@ -141,7 +163,7 @@ else
     if subj.whichSess == 1
         stim_filename = 'naming_task_stim_pre_02May18.txt';
     elseif subj.whichSess == 2
-        stim_filename = 'naming_task_stim_posttrain.txt';
+        stim_filename = 'naming_task_stim_post_10Jul18.txt';
     end
 end
 
@@ -168,7 +190,6 @@ end
 
 % Load predetermined counterbalance
 cd(dir_funcs)
-load('naming_sentence_order_pre.mat')
 stimulicheck_naming(t.sentNum, stimKey)
 
 %% Open PTB and RTBox
