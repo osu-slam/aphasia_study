@@ -37,6 +37,7 @@
 %   b) changing scan time split from 4sec/10sec to 8sec/8sec. DONE!
 %   c) adding visual cue one beat (~.9sec) before TW is to speak. ***
 %   d) add new stimuli (first thing tomorrow!!!)
+% 07/20/18 -- Finished vocoded stimuli, changed how stim load.
 
 % function naming_primes_v1_laptop
 %% Startup
@@ -57,6 +58,14 @@ fontsize = 36;
 bpm      = 65;
 color    = [255 0 0];
 primeNum = 16; % Now there's a prime for each sentence!
+stimType = 'voice-9_rhythm-9';
+% '1ch_voice-9';          % Vocoded (noise) without rhythms
+% '1ch_voice-9_rhythm0';  % Vocoded (noise) with loud rhythms
+% '1ch_voice-9_rhythm-9'; % Vocoded (noise) with quiet rhythms
+% 'rhythm0';              % Loud rhythms
+% 'rhythm-9';             % Quiet rhythms
+% 'voice-9_rhythm0';      % Clear speech with loud rhythms
+% 'voice-9_rhythm-9';     % Clear speech with quiet rhythms
 
 %% Paths
 cd ..
@@ -64,7 +73,7 @@ dir_exp     = pwd;
 dir_results = fullfile(dir_exp, 'results');
 dir_scripts = fullfile(dir_exp, 'scripts');
 dir_stim    = fullfile(dir_exp, 'stim', 'naming_task');
-dir_primes  = fullfile(dir_exp, 'stim', 'rhythm_primes'); 
+dir_primes  = fullfile(dir_exp, 'stim', 'rhythm_primes', stimType); 
 dir_funcs   = fullfile(dir_scripts, 'functions');
 % Instructions = 'instructions_lang.txt';
 
@@ -75,7 +84,7 @@ t.events  = 16;
 
 t.T          = (bpm/60)^-1; % duration of one beat of prime
 t.wholePrime = t.T*8; % duration of entire stimuli
-t.visCueTime = t.T*3; % time at which visual prime should be presented, 
+t.visCueTime = t.T*4; % time at which visual prime should be presented, 
                        % relative to the start of the prime
 
 t.jitWindow   = 0.500; 
@@ -115,8 +124,8 @@ firstPulse = NaN(1, 1);
 runEnd     = NaN(1, 1); 
 
 %% File names
-ResultsXls = fullfile(dir_results, 'post_screen_naming_primes_17Jul18', 'naming_primes_laptop_results.xlsx'); 
-Variables  = fullfile(dir_results, 'post_screen_naming_primes_17Jul18', 'naming_primes_laptop_variables.mat');
+ResultsXls = fullfile(dir_results, 'post_screen_naming_primes_20Jul18', [ stimType '_naming_primes_laptop_results.xlsx']); 
+Variables  = fullfile(dir_results, 'post_screen_naming_primes_20Jul18', [ stimType '_naming_primes_laptop_variables.mat']);
     
 %% Load stim
 stim_filename = 'naming_task_stim_post_10Jul18_behav.txt.';
