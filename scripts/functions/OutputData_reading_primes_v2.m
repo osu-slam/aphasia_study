@@ -7,6 +7,7 @@
 % 10/08/17  Ready for subject 3. --MH
 % 21/02/18  Customized for aphasia_study -- MH
 % 05/03/18  Finished for aphasia study
+% 31/07/18  VERSION 3 IS USED IN 
 
 headers = {'Jitter key', 'Actual jitter', ... 
         'Stim start key', 'Actual stim start', ...
