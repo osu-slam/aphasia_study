@@ -40,10 +40,6 @@ actJit       = stimStart    - eventStart;
 actEventDur  = eventEnd     - eventStart; 
 respTimeRel  = respTime_mat - stimEnd;
 
-% Path
-mkdir(fullfile(dir_results, subj.num))
-cd(fullfile(dir_results, subj.num))
-
 % Checks if files already exists to prevent overwrite
 while exist(ResultsXls, 'file') == 2
 	ResultsXls = [ResultsXls(1:end-5), '_new', ResultsXls(end-4:end)]; 

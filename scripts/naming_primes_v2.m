@@ -38,6 +38,7 @@
 %   c) adding visual cue one beat (~.9sec) before TW is to speak. ***
 %   d) add new stimuli (first thing tomorrow!!!)
 % 07/20/18 -- Finished vocoded stimuli, changed how stim load.
+% 07/31/18 -- Updated for post-scan. 
 
 % function naming_primes_v1_laptop
 %% Startup
@@ -72,15 +73,15 @@ bpm      = 65;
 color    = [255 0 0];
 fs_trgt  = 44100; 
 primeNum = 16; % Now there's a prime for each sentence!
-stimType = {'voice9_rhythm9', 'ch1_voice9_rhythm9', 'voice9'};
-% 'ch1_voice9';         % Vocoded (noise) without rhythms
-% 'ch1_voice9_rhythm0'; % Vocoded (noise) with loud rhythms
-% 'ch1_voice9_rhythm9'; % Vocoded (noise) with quiet rhythms
-% 'rhythm0';            % Loud rhythms
-% 'rhythm9';            % Quiet rhythms
-% 'voice9';             % Clear speech
-% 'voice9_rhythm0';     % Clear speech with loud rhythms
-% 'voice9_rhythm9';     % Clear speech with quiet rhythms
+stimType = {'voice9_rhythm9_rms', 'ch1_voice9_rhythm9_rms', 'voice9_rms'};
+% 'ch1_voice9_rms';         % Vocoded (noise) without rhythms
+% 'ch1_voice9_rhythm0_rms'; % Vocoded (noise) with loud rhythms
+% 'ch1_voice9_rhythm9_rms'; % Vocoded (noise) with quiet rhythms
+% 'rhythm0_rms';            % Loud rhythms
+% 'rhythm9_rms';            % Quiet rhythms
+% 'voice9_rms';             % Clear speech
+% 'voice9_rhythm0_rms';     % Clear speech with loud rhythms
+% 'voice9_rhythm9_rms';     % Clear speech with quiet rhythms
 
 %% Paths
 cd ..
@@ -124,31 +125,36 @@ if t.numBlocks ~= 3
 end
 
 %% Preallocating timing variables. 
-AbsEvStart    = NaN(t.events, 1); 
-AbsStimStart  = NaN(t.events, 1); 
-AbsVisCue     = NaN(t.events, 1); 
-AbsStimEnd    = NaN(t.events, 1); 
-AbsEvEnd      = NaN(t.events, 1); 
-eventEnd      = NaN(t.events, 1); 
-eventEndKey   = NaN(t.events, 1); 
-eventStart    = NaN(t.events, 1);
-eventStartKey = NaN(t.events, 1); 
-jitterKey     = NaN(t.events, 1); 
-stimStart     = NaN(t.events, 1); 
-visCue        = NaN(t.events, 1);
-stimEnd       = NaN(t.events, 1); 
-stimStartKey  = NaN(t.events, 1); 
-visCueKey     = NaN(t.events, 1); 
-stimEndKey    = NaN(t.events, 1); 
-stimKey       = NaN(t.events, 1); 
-durationKey   = NaN(t.events, 1); 
+AbsEvStart    = NaN(t.events, t.numBlocks); 
+AbsStimStart  = NaN(t.events, t.numBlocks); 
+AbsVisCue     = NaN(t.events, t.numBlocks); 
+AbsStimEnd    = NaN(t.events, t.numBlocks); 
+AbsEvEnd      = NaN(t.events, t.numBlocks); 
+eventEnd      = NaN(t.events, t.numBlocks); 
+eventStart    = NaN(t.events, t.numBlocks); 
+stimStart     = NaN(t.events, t.numBlocks); 
+visCue        = NaN(t.events, t.numBlocks); 
+stimEnd       = NaN(t.events, t.numBlocks); 
+stimKey       = NaN(t.events, t.numBlocks); 
+durationKey   = NaN(t.events, t.numBlocks); 
 
-firstPulse = NaN(1, 1); 
-runEnd     = NaN(1, 1); 
+firstPulse = NaN(1, t.numBlocks); 
+runEnd     = NaN(1, t.numBlocks); 
+
+for blk = 1:t.numBlocks
+    stimKey(:, blk) = Shuffle(1:16)';
+end
+
+eventStartKey = repmat((t.epiTime + [0:t.eventTime:((t.events-1)*t.eventTime)]'), [1, t.numBlocks]);  %#ok<NBRAK>
+jitterKey     = t.jitWindow * rand(t.events, t.numBlocks);
+stimStartKey  = eventStartKey + jitterKey; 
+visCueKey     = stimStartKey + t.visCueTime; 
+stimEndKey    = stimStartKey + t.presTime;
+eventEndKey   = eventStartKey + t.eventTime;
 
 %% File names
-ResultsXls = fullfile(dir_results, 'post_scan_naming_primes_9Aug18', [ subj.num '_naming_primes_v2_results.xlsx']); 
-Variables  = fullfile(dir_results, 'post_scan_naming_primes_9Aug18', [ subj.num '_naming_primes_v2_variables.mat']);
+ResultsXls = fullfile(dir_results, subj.num, 'post_scan_naming_primes_v2_results.xlsx'); 
+Variables  = fullfile(dir_results, subj.num, 'post_scan_naming_primes_v2_variables.mat');
 
 %% Load stim
 stim_filename = 'naming_task_stim_post_10Jul18_behav.txt.';
@@ -212,40 +218,6 @@ RTBox('fake', 1);
 pahandle = PsychPortAudio('Open', [], [], [], fs_trgt);
 Screen('TextSize', wPtr, fontsize); 
 
-%% Prepare test
-AbsEvStart    = NaN(t.events, t.numBlocks); 
-AbsStimStart  = NaN(t.events, t.numBlocks); 
-AbsVisCue     = NaN(t.events, t.numBlocks); 
-AbsStimEnd    = NaN(t.events, t.numBlocks); 
-AbsEvEnd      = NaN(t.events, t.numBlocks); 
-eventEnd      = NaN(t.events, t.numBlocks); 
-eventEndKey   = NaN(t.events, t.numBlocks); 
-eventStart    = NaN(t.events, t.numBlocks); 
-eventStartKey = NaN(t.events, t.numBlocks); 
-jitterKey     = NaN(t.events, t.numBlocks); 
-stimStart     = NaN(t.events, t.numBlocks); 
-visCue        = NaN(t.events, t.numBlocks); 
-stimEnd       = NaN(t.events, t.numBlocks); 
-stimStartKey  = NaN(t.events, t.numBlocks); 
-visCueKey     = NaN(t.events, t.numBlocks); 
-stimEndKey    = NaN(t.events, t.numBlocks); 
-stimKey       = NaN(t.events, t.numBlocks); 
-durationKey   = NaN(t.events, t.numBlocks); 
-
-firstPulse = NaN(1, t.numBlocks); 
-runEnd     = NaN(1, t.numBlocks); 
-
-for blk = 1:t.numBlocks
-    stimKey(:, blk) = Shuffle(1:16)';
-end
-
-eventStartKey = repmat((t.epiTime + [0:t.eventTime:((t.events-1)*t.eventTime)]'), [1, t.numBlocks]); 
-jitterKey     = t.jitWindow * rand(t.events, t.numBlocks);
-stimStartKey  = eventStartKey + jitterKey; 
-visCueKey     = stimStartKey + t.visCueTime; 
-stimEndKey    = stimStartKey + t.presTime;
-eventEndKey   = eventStartKey + t.eventTime;
-            
 try
     for blk = subj.firstRun:subj.lastRun
         % Wait for first pulse
@@ -305,8 +277,6 @@ try
         DrawFormattedText(wPtr, 'End of run. Great job!', 'center', 'center', [0 0 0]); 
         Screen('Flip', wPtr); 
         WaitTill(GetSecs() + 6);
-        
-        blk = blk + 1;
                     
     end
     

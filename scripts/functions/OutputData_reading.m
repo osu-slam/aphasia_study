@@ -26,10 +26,6 @@ actStimDur   = stimEnd   - stimStart;
 actJit       = stimStart - eventStart; 
 actEventDur  = eventEnd - eventStart; 
 
-% Path
-mkdir(fullfile(dir_results, 'post_screen_10Jul18'))
-cd(fullfile(dir_results, 'post_screen_10Jul18'))
-
 % Checks if files already exists to prevent overwrite
 while exist(ResultsXls, 'file') == 2
 	ResultsXls = [ResultsXls(1:end-5), '_new', ResultsXls(end-4:end)]; 

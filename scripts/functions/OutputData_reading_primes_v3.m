@@ -28,8 +28,7 @@ actJit       = stimStart - eventStart;
 actEventDur  = eventEnd  - eventStart; 
 
 % Path
-mkdir(fullfile(dir_results, 'post_screen_17Jul18'))
-cd(fullfile(dir_results, 'post_screen_17Jul18'))
+mkdir(fullfile(dir_results, subj.num))
 
 % Checks if files already exists to prevent overwrite
 while exist(ResultsXls, 'file') == 2
@@ -59,7 +58,7 @@ for rr = 1:blk
     
     %% Print to xlsx file
     warning off
-    runNum = ['run ', num2str(rr), ': ' stimType{rr}];
+    runNum = ['run ', num2str(rr), ' ' stimType{rr}];
     
     xlswrite(ResultsXls, data, runNum)
     warning on

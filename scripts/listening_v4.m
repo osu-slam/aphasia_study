@@ -165,8 +165,8 @@ respTime = cell(t.events, maxNumRuns);
 respKey  = cell(t.events, maxNumRuns); 
 
 %% File names
-ResultsXls = fullfile(dir_results, [subj.num '_listening_' sesstag '_results.xlsx']); 
-Variables  = fullfile(dir_results, [subj.num '_listening_' sesstag '_variables.mat']); 
+ResultsXls = fullfile(dir_results, 'post_scan_listening_v4_results.xlsx'); 
+Variables  = fullfile(dir_results, 'post_scan_listening_v4_variables.mat'); 
 
 %% Load stim
 % Stimuli

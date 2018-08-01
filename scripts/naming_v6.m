@@ -140,8 +140,8 @@ firstPulse = NaN(1, maxNumRuns);
 runEnd     = NaN(1, maxNumRuns); 
 
 %% File names
-ResultsXls = fullfile(dir_results, subj.num, [subj.num '_exp_results.xlsx']); 
-Variables  = fullfile(dir_results, subj.num, [subj.num '_exp_variables.mat']);
+ResultsXls = fullfile(dir_results, subj.num, 'post_scan_naming_v6_results.xlsx'); 
+Variables  = fullfile(dir_results, subj.num, 'post_scan_naming_v6_variables.mat');
     
 %% Load stim
 if Test
