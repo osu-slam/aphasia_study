@@ -58,8 +58,8 @@ AudioDevice = PsychPortAudio('GetDevices', 3); % Changes based on OS
 
 prompt = {...
     'Subject number (####YL)', ...
-    'First run (1-3: 1 is rhy+ sp+, 2 is rhy+ sp-, 3 is rhy- sp+)', ... 
-    'Last run (1-3)', ... 
+    'First run (1-6: 1&2 are rhy+sp+, 3&4 are rhy+sp-, 5&6 are rhy-sp+)', ... 
+    'Last run (1-6)', ... 
     'RTBox connected (0/1):', ...
     }; 
 dlg_ans = inputdlg(prompt); 
@@ -142,11 +142,11 @@ durationKey   = NaN(t.events, t.numBlocks);
 firstPulse = NaN(1, t.numBlocks); 
 runEnd     = NaN(1, t.numBlocks); 
 
-for blk = 1:t.numBlocks
+for blk = 1:2:t.numBlocks
     temp = Shuffle(1:16)';
-    stimKey(:, blk) = temp(1:8); % temporary fix. events are not counterbalanced
+    stimKey(:, blk) = temp(1:t.events); % temporary fix. events are not counterbalanced
+    stimKey(:, blk+1) = temp(t.events+1:t.sentNum);
 end
-warning('EVENTS ARE NOT COUNTERBALANCED')
 
 eventStartKey = repmat((t.epiTime + [0:t.eventTime:((t.events-1)*t.eventTime)]'), [1, t.numBlocks]);  %#ok<NBRAK>
 jitterKey     = t.jitWindow * rand(t.events, t.numBlocks);
