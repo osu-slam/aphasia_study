@@ -100,7 +100,7 @@ dir_funcs     = fullfile(dir_scripts, 'functions');
 t.stimNum   = 16; % no jabberwocky!
 t.sentNum   = 16; 
 t.events    = 8;  % AS OF 8/16 EVENTS ARE NOT COUNTERBALANCED!!!
-t.numBlocks = 3;
+t.numBlocks = 6;
 
 t.T          = (bpm/60)^-1; % duration of one beat of prime
 t.wholePrime = t.T*8; % duration of entire stimuli
@@ -122,7 +122,7 @@ end
 
 % TEST -- Everything breaks if you change number of blocks...
 if t.numBlocks ~= 3
-    error('t.numBlocks is not 3, code may not work!')
+    warning('t.numBlocks is not 3, code may not work!')
 end
 
 %% Preallocating timing variables. 
@@ -142,10 +142,10 @@ durationKey   = NaN(t.events, t.numBlocks);
 firstPulse = NaN(1, t.numBlocks); 
 runEnd     = NaN(1, t.numBlocks); 
 
-for blk = 1:2:t.numBlocks
+for blk = 1:3
     temp = Shuffle(1:16)';
     stimKey(:, blk) = temp(1:t.events); % temporary fix. events are not counterbalanced
-    stimKey(:, blk+1) = temp(t.events+1:t.sentNum);
+    stimKey(:, blk+3) = temp(t.events+1:t.sentNum);
 end
 
 eventStartKey = repmat((t.epiTime + [0:t.eventTime:((t.events-1)*t.eventTime)]'), [1, t.numBlocks]);  %#ok<NBRAK>
@@ -180,7 +180,7 @@ fs = cell(1, t.numBlocks);
 prime_aud = struct(stimType{1}, [], stimType{2}, [], stimType{3}, []);
 prime_end = struct(stimType{1}, [], stimType{2}, [], stimType{3}, []);
 
-for jj = 1:t.numBlocks
+for jj = 1:3
     cd(dir_primes{jj})
     % prime_aud = cell(1, t.primesNum); 
     fs{jj} = nan(1, primeNum);
@@ -249,7 +249,13 @@ try
             eventStart(evt, blk) = GetSecs(); 
             
             % PREPARE AUDIO AND TEXT(flip screen, prepare the prime)
-            PsychPortAudio('FillBuffer', pahandle, prime_aud(stimKey(evt, blk)).(stimType{blk}));
+            if blk > 3
+                stimnum = blk - 3;
+            else
+                stimnum = blk;
+            end
+            
+            PsychPortAudio('FillBuffer', pahandle, prime_aud(stimKey(evt, blk)).(stimType{stimnum}));
             DrawFormattedText(wPtr, stim_line{stimKey(evt, blk)}, 'center', 'center', [0 0 0]);
             WaitTill(AbsStimStart(evt, blk) - 0.1);
             

@@ -58,7 +58,12 @@ for rr = 1:blk
     
     %% Print to xlsx file
     warning off
-    runNum = ['run ', num2str(rr), ' ' stimType{rr}];
+    if blk > 3
+        stimnum = blk - 3;
+    else
+        stimnum = blk;
+    end
+    runNum = ['run ', num2str(rr), ' ' stimType{stimnum}];
     
     xlswrite(ResultsXls, data, runNum)
     warning on
