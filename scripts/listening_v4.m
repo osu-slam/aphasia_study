@@ -1,4 +1,4 @@
-%% listening_v3.m
+%% listening_v4.m
 % Script to run perceptive language task for aphasia study. Ported from 
 % isss_multiband_v7 on 5 March 2018. 
 % Author - Matt Heard
